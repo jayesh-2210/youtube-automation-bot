@@ -54,6 +54,49 @@ class ScriptWriter:
             print(f"Error generating script: {str(e)}")
             return ""
 
+    def generate_shorts_script(self, topic: str) -> str:
+        """
+        Generates a short, punchy motivational script (~120 words / ~45 seconds).
+        """
+        prompt = f"""
+        Write a powerful, ultra-short motivational script for a YouTube Short.
+        Topic: {topic}
+        Style: Poetic, punchy, cinematic voiceover — like a movie trailer meets a motivational speech.
+        Length: Exactly 110–130 words. No more. No less.
+
+        Structure:
+        1. ONE explosive hook sentence that grabs attention immediately.
+        2. Three to four short, hard-hitting body lines — each a standalone punch.
+        3. ONE unforgettable closing line that lingers in the mind.
+
+        Rules:
+        - No stage directions. No brackets. No [Music]. No [Cut to].
+        - Pure spoken words only.
+        - Every single word must earn its place.
+        - Write in second person ("you", "your") to speak directly to the viewer.
+
+        Start immediately with the hook. No preamble.
+        """
+
+        try:
+            import openai
+            client = openai.OpenAI(
+                base_url="https://openrouter.ai/api/v1",
+                api_key=self.api_key,
+            )
+            response = client.chat.completions.create(
+                model="liquid/lfm-2.5-1.2b-instruct:free",
+                messages=[
+                    {"role": "system", "content": "You are an elite motivational scriptwriter who crafts viral YouTube Shorts with cinematic, poetic voiceovers."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            return response.choices[0].message.content.strip()
+
+        except Exception as e:
+            print(f"Error generating shorts script: {str(e)}")
+            return ""
+
 if __name__ == "__main__":
     writer = ScriptWriter()
     sample_topic = "How Elon Musk Built Tesla"

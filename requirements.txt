@@ -7,3 +7,4 @@ google-auth-httplib2
 requests
 python-dotenv
 ffmpeg-python
+gTTS==2.5.4

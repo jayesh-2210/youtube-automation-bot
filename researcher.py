@@ -27,7 +27,18 @@ class Researcher:
                 "The Mindset Protocol of David Goggins",
                 "How to Overcome Procrastination Forever",
                 "The Daily Routine of Billionaires",
-                "Why Failure is Your Best Teacher"
+                "Why Failure is Your Best Teacher",
+                "You Are Closer Than You Think",
+                "The 1% Rule That Will Change Your Life",
+                "Stop Waiting for the Perfect Moment",
+                "The Night Before Everything Changed",
+                "What Discipline Really Looks Like",
+                "The Secret the Most Successful People Share",
+                "Hard Work Beats Talent When Talent Doesn't Work Hard",
+                "Every Expert Was Once a Beginner",
+                "Your Future Self Will Thank You",
+                "The Power of Showing Up Every Single Day",
+                "Do It Scared. Do It Anyway."
             ],
             "luxury_lifestyle": [
                 "Inside the Most Expensive Yachts in the World",

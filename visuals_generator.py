@@ -12,14 +12,15 @@ class VisualsGenerator:
         
         self.headers = {"Authorization": self.api_key}
 
-    def search_videos(self, query: str, per_page: int = 5) -> list:
+    def search_videos(self, query: str, per_page: int = 5, orientation: str = "landscape") -> list:
         """
         Searches Pexels for videos related to a keyword query.
+        orientation: 'landscape' for standard videos, 'portrait' for Shorts (9:16).
         """
         if not self.api_key:
             return []
 
-        url = f"https://api.pexels.com/videos/search?query={query}&per_page={per_page}&orientation=landscape"
+        url = f"https://api.pexels.com/videos/search?query={query}&per_page={per_page}&orientation={orientation}"
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
@@ -51,9 +52,20 @@ class VisualsGenerator:
         Finds and downloads `count` relevant videos for a query.
         Returns a list of local file paths.
         """
-        print(f"Searching for visuals matching: '{query}'...")
-        videos = self.search_videos(query, per_page=count * 2) # Grab extra in case some don't have good formats
+        print(f"Searching for landscape visuals matching: '{query}'...")
+        videos = self.search_videos(query, per_page=count * 2, orientation="landscape")
+        return self._process_videos(videos, query, output_dir, count)
+
+    def generate_shorts_b_roll(self, query: str, output_dir: str = "assets/video", count: int = 3) -> list:
+        """
+        Finds and downloads `count` portrait (9:16) videos for Shorts.
+        """
+        print(f"Searching for portrait visuals matching: '{query}'...")
+        videos = self.search_videos(query, per_page=count * 2, orientation="portrait")
+        return self._process_videos(videos, query, output_dir, count)
         
+    def _process_videos(self, videos: list, query: str, output_dir: str, count: int) -> list:
+        """Helper to download the best HD files from Pexels results."""
         downloaded_paths = []
         for i, video in enumerate(videos):
             if len(downloaded_paths) >= count:
@@ -61,12 +73,14 @@ class VisualsGenerator:
                 
             # Filter for HD links
             video_files = video.get("video_files", [])
-            hd_files = [f for f in video_files if f.get("quality") == "hd" or f.get("width", 0) >= 1280]
+            # For portrait, height is the larger dimension, but we just want high quality
+            hd_files = [f for f in video_files if f.get("quality") == "hd" or max(f.get("width", 0), f.get("height", 0)) >= 1280]
             
             if not hd_files:
                 continue
                 
-            best_file = sorted(hd_files, key=lambda x: x.get("width", 0), reverse=True)[0]
+            # Sort by highest resolution (multiplying width * height)
+            best_file = sorted(hd_files, key=lambda x: x.get("width", 0) * x.get("height", 0), reverse=True)[0]
             download_link = best_file.get("link")
             
             filename = f"broll_{query.replace(' ', '_')}_{i}.mp4"
@@ -80,5 +94,5 @@ class VisualsGenerator:
 if __name__ == "__main__":
     generator = VisualsGenerator()
     query = "money"
-    paths = generator.generate_b_roll_for_query(query, count=2)
+    paths = generator.generate_shorts_b_roll(query, count=2)
     print(f"Downloaded files: {paths}")
